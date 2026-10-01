@@ -1,0 +1,90 @@
+/* Student flow screens and large touch-friendly roster controls. */
+.student-page { padding: 20px; }
+.student-shell { width: min(100%, 980px); min-height: calc(100vh - 40px); margin: 0 auto; display: flex; flex-direction: column; justify-content: center; padding: clamp(18px, 4vw, 40px); }
+.flow-screen { animation: arrive 260ms ease-out both; text-align: center; }
+.flow-screen h1 { margin: 0 0 12px; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.08; }
+.flow-screen .prompt { margin: 0 0 28px; color: var(--muted); font-size: clamp(1.15rem, 3vw, 1.5rem); }
+.eyebrow { margin: 0 0 10px; color: #397c78; font-size: 1rem; font-weight: 800; text-transform: uppercase; }
+.class-list, .name-grid, .choice-row { display: grid; gap: 14px; width: min(100%, 740px); margin: 0 auto; }
+.class-list { grid-template-columns: 1fr; }
+.name-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.choice-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pick-button { min-height: 82px; padding: 14px 10px; border: 3px solid var(--line); border-radius: 12px; background: white; color: var(--ink); font-size: clamp(1.2rem, 3.2vw, 1.8rem); font-weight: 800; cursor: pointer; transition: transform 120ms ease, border-color 120ms ease, background 120ms ease; }
+.pick-button:hover { border-color: var(--teal); background: var(--sky); transform: translateY(-2px); }
+.pick-button.confirm-yes { background: var(--sun); border-color: var(--sun); }
+.pick-button.go-back { background: #f4e8df; }
+.welcome-name { color: #b84f3e; }
+.welcome-mark { margin: 0 0 18px; font-size: 4rem; }
+.flow-screen .button { margin: 10px auto 0; min-width: min(100%, 320px); }
+.back-link { display: inline-block; margin-top: 22px; font-size: 1.1rem; font-weight: 700; text-underline-offset: 4px; }
+.lesson-screen { width: 100%; animation: arrive 260ms ease-out both; }
+.lesson-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 12px; }
+.lesson-title-group { display: flex; min-width: 0; align-items: center; gap: 12px; }
+.lesson-header h1 { margin: 0; font-size: clamp(1.4rem, 3.4vw, 2.1rem); }
+.test-mode-label { flex: 0 0 auto; padding: 4px 8px; border: 1px solid #bf9350; border-radius: 5px; background: #fff5d9; color: #715320; font-size: 0.75rem; font-weight: 800; }
+.lesson-progress { flex: 0 0 auto; padding: 8px 12px; border-radius: 999px; background: var(--sky); font-size: 1rem; font-weight: 800; }
+.progress-track { height: 12px; overflow: hidden; margin-bottom: 16px; border-radius: 99px; background: #e3e8e2; }
+.progress-fill { width: 0; height: 100%; border-radius: inherit; background: var(--teal); transition: width 220ms ease; }
+.activity-mount { min-height: 430px; }
+.finish-mark { margin: 0 0 14px; color: #d69119; font-size: 5rem; line-height: 1; }
+@media (max-width: 680px) {
+  .student-page { padding: 12px; }
+  .student-shell { min-height: calc(100vh - 24px); padding: 18px 10px; }
+  .name-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .pick-button { min-height: 74px; }
+  .activity-mount { min-height: 390px; }
+}
+@media (max-width: 380px) { .choice-row { grid-template-columns: 1fr; } .lesson-header { align-items: flex-start; flex-direction: column; } .lesson-title-group { flex-wrap: wrap; } }
+/* =========================================================
+   FULL-VIEWPORT LESSON MODE
+   Keep active lessons on one Chromebook screen.
+   Scrolling should only occur inside activities specifically
+   designed to teach scrolling.
+   ========================================================= */
+
+.student-page:has(.lesson-screen) {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+  padding: 8px 12px;
+}
+
+.student-page:has(.lesson-screen) .student-shell {
+  width: min(100%, 1360px);
+  height: calc(100dvh - 16px);
+  min-height: 0;
+  margin: 0 auto;
+  padding: 6px 12px;
+  justify-content: flex-start;
+}
+
+.student-page:has(.lesson-screen) .lesson-screen {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.student-page:has(.lesson-screen) .lesson-header {
+  margin-bottom: 6px;
+}
+
+.student-page:has(.lesson-screen) .lesson-header h1 {
+  font-size: clamp(1.35rem, 2.5vw, 1.9rem);
+}
+
+.student-page:has(.lesson-screen) .lesson-progress {
+  padding: 6px 11px;
+  font-size: 0.95rem;
+}
+
+.student-page:has(.lesson-screen) .progress-track {
+  height: 9px;
+  margin-bottom: 8px;
+}
+
+.student-page:has(.lesson-screen) .activity-mount {
+  min-height: 0;
+  overflow: hidden;
+}

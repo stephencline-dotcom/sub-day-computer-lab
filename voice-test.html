@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+  <title>Kid Guide Voice Studio</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      background:
+        linear-gradient(135deg, #eaf8ff, #fff7dc);
+      color: #173d4b;
+    }
+
+    main {
+      width: min(900px, 94vw);
+      margin: 30px auto;
+      padding: 28px;
+      border-radius: 26px;
+      background: white;
+      box-shadow: 0 15px 40px rgba(28,83,103,.15);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 2rem;
+    }
+
+    .voice-card {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      margin: 10px 0;
+      border: 2px solid #dcecf1;
+      border-radius: 16px;
+    }
+
+    .voice-card.selected {
+      border-color: #2d9f87;
+      background: #ecfbf5;
+    }
+
+    .voice-name {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      font-weight: 900;
+    }
+
+    .voice-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .male-badge {
+      background: #e4f1ff;
+      color: #275d90;
+      border: 1px solid #add1f3;
+    }
+
+    .natural-badge {
+      background: #e5f8ed;
+      color: #24704c;
+      border: 1px solid #a7dfbf;
+    }
+
+    .voice-meta {
+      margin-top: 3px;
+      color: #5d7380;
+      font-size: .9rem;
+    }
+
+    button {
+      min-height: 44px;
+      padding: 9px 16px;
+      border: 0;
+      border-radius: 999px;
+      background: #237c91;
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    button.use {
+      background: #2c9b72;
+    }
+
+    .controls {
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+      padding: 18px;
+      border-radius: 16px;
+      background: #f2f8fa;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-weight: 800;
+    }
+
+    #status {
+      min-height: 28px;
+      font-weight: 900;
+      color: #247155;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>🎧 Kid Guide Voice Studio</h1>
+
+    <p>
+      Listen to the voices available on this Chromebook.
+      Pick the one that sounds most like a friendly teacher.
+    </p>
+
+    <div class="controls">
+      <label>
+        Speed
+        <input
+          id="rate"
+          type="range"
+          min="0.72"
+          max="1.05"
+          step="0.01"
+          value="0.88"
+        >
+      </label>
+
+      <label>
+        Pitch
+        <input
+          id="pitch"
+          type="range"
+          min="0.88"
+          max="1.12"
+          step="0.01"
+          value="1"
+        >
+      </label>
+    </div>
+
+    <p id="status"></p>
+
+    <div id="voices"></div>
+  </main>
+
+  <script>
+    const list = document.querySelector("#voices");
+    const status = document.querySelector("#status");
+    const rate = document.querySelector("#rate");
+    const pitch = document.querySelector("#pitch");
+
+    const sample =
+      "Hi there! I'm your computer teacher today. " +
+      "We're going to have some fun together. " +
+      "Move Buzz to the yellow flower. " +
+      "Great job! You found it. Now you try.";
+
+    /*
+     * Browsers do not provide true gender metadata.
+     * These are common male-sounding English voice names.
+     * This is only a helpful sorting guess.
+     */
+    const likelyMalePattern =
+      /male|guy|christopher|david|mark|roger|eric|andrew|brian|ryan|george|daniel|james|thomas|matthew|aaron|arthur|fred|lee|oliver/i;
+
+    function isLikelyMale(voice) {
+      return likelyMalePattern.test(voice.name);
+    }
+
+    function voiceScore(voice) {
+      let score = 0;
+
+      if (isLikelyMale(voice)) score += 100;
+
+      if (
+        /natural|premium|enhanced/i.test(voice.name)
+      ) {
+        score += 40;
+      }
+
+      if (
+        voice.lang &&
+        voice.lang.toLowerCase() === "en-us"
+      ) {
+        score += 20;
+      }
+
+      if (
+        /microsoft/i.test(voice.name)
+      ) {
+        score += 8;
+      }
+
+      if (
+        /google/i.test(voice.name)
+      ) {
+        score += 6;
+      }
+
+      return score;
+    }
+
+    function savedVoice() {
+      try {
+        return localStorage.getItem(
+          "subDayPreferredVoiceName"
+        ) || "";
+      } catch {
+        return "";
+      }
+    }
+
+    function playVoice(voice) {
+      speechSynthesis.cancel();
+
+      const utterance =
+        new SpeechSynthesisUtterance(sample);
+
+      utterance.voice = voice;
+      utterance.lang = voice.lang || "en-US";
+      utterance.rate = Number(rate.value);
+      utterance.pitch = Number(pitch.value);
+      utterance.volume = 1;
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function useVoice(voice) {
+      try {
+        localStorage.setItem(
+          "subDayPreferredVoiceName",
+          voice.name
+        );
+
+        localStorage.setItem(
+          "subDayVoiceRate",
+          rate.value
+        );
+
+        localStorage.setItem(
+          "subDayVoicePitch",
+          pitch.value
+        );
+
+        status.textContent =
+          `Saved: ${voice.name}`;
+
+        render();
+      } catch {
+        status.textContent =
+          "This browser could not save the voice.";
+      }
+    }
+
+    function render() {
+      const voices =
+        speechSynthesis
+          .getVoices()
+          .filter(
+            voice =>
+              voice.lang &&
+              voice.lang
+                .toLowerCase()
+                .startsWith("en")
+          )
+          .sort((a, b) => {
+            const scoreDifference =
+              voiceScore(b) - voiceScore(a);
+
+            if (scoreDifference !== 0) {
+              return scoreDifference;
+            }
+
+            return a.name.localeCompare(b.name);
+          });
+
+      list.replaceChildren();
+
+      const selected = savedVoice();
+
+      voices.forEach(voice => {
+        const card =
+          document.createElement("div");
+
+        card.className =
+          "voice-card" +
+          (
+            voice.name === selected
+              ? " selected"
+              : ""
+          );
+
+        const info =
+          document.createElement("div");
+
+        const maleGuess =
+          isLikelyMale(voice);
+
+        const naturalGuess =
+          /natural|premium|enhanced/i.test(
+            voice.name
+          );
+
+        info.innerHTML = `
+          <div class="voice-name">
+            ${voice.name}
+
+            ${
+              maleGuess
+                ? '<span class="voice-badge male-badge">Likely male</span>'
+                : ""
+            }
+
+            ${
+              naturalGuess
+                ? '<span class="voice-badge natural-badge">Natural</span>'
+                : ""
+            }
+          </div>
+
+          <div class="voice-meta">
+            ${voice.lang}
+            ${voice.localService
+              ? " • Local"
+              : " • Network"}
+          </div>
+        `;
+
+        const listen =
+          document.createElement("button");
+
+        listen.textContent = "▶ Listen";
+
+        listen.addEventListener(
+          "click",
+          () => playVoice(voice)
+        );
+
+        const use =
+          document.createElement("button");
+
+        use.className = "use";
+        use.textContent =
+          "✓ Use for Kid Guide";
+
+        use.addEventListener(
+          "click",
+          () => useVoice(voice)
+        );
+
+        card.append(info, listen, use);
+        list.append(card);
+      });
+
+      if (!voices.length) {
+        list.textContent =
+          "Waiting for Chromebook voices...";
+      }
+    }
+
+    rate.addEventListener("change", () => {
+      try {
+        localStorage.setItem(
+          "subDayVoiceRate",
+          rate.value
+        );
+      } catch {}
+    });
+
+    pitch.addEventListener("change", () => {
+      try {
+        localStorage.setItem(
+          "subDayVoicePitch",
+          pitch.value
+        );
+      } catch {}
+    });
+
+    render();
+
+    speechSynthesis.onvoiceschanged = render;
+
+    setTimeout(render, 250);
+    setTimeout(render, 800);
+  </script>
+</body>
+</html>

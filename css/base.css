@@ -1,0 +1,40 @@
+/* Shared foundation and role-selection page styles. */
+:root {
+  color-scheme: light;
+  --ink: #18333d;
+  --muted: #53666c;
+  --paper: #fffdf6;
+  --sun: #ffcf4a;
+  --coral: #ef725e;
+  --teal: #2c9b91;
+  --sky: #dff3f1;
+  --line: #d7e2dd;
+  font-family: "Trebuchet MS", "Arial Rounded MT Bold", sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+* { box-sizing: border-box; }
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--paper);
+  background-image: radial-gradient(#efdca8 0.8px, transparent 0.8px);
+  background-size: 24px 24px;
+}
+button, a { font: inherit; }
+a { color: inherit; }
+button:focus-visible, a:focus-visible { outline: 4px solid #1f7777; outline-offset: 4px; }
+.home-page, .teacher-page { display: grid; place-items: center; padding: 24px; }
+.home-shell { width: min(100%, 720px); padding: clamp(32px, 8vw, 72px) 24px; text-align: center; animation: arrive 420ms ease-out both; }
+.home-shell h1 { margin: 0 0 36px; font-size: clamp(2.6rem, 8vw, 5rem); line-height: 1.03; }
+.home-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; max-width: 580px; margin: 0 auto; }
+.button { display: inline-flex; min-height: 76px; align-items: center; justify-content: center; padding: 16px 24px; border: 3px solid transparent; border-radius: 12px; color: var(--ink); font-size: 1.5rem; font-weight: 800; text-align: center; text-decoration: none; cursor: pointer; transition: transform 130ms ease, filter 130ms ease; }
+.button:hover { filter: brightness(0.97); transform: translateY(-2px); }
+.button-student { background: var(--sun); }
+.button-teacher { background: #f3a18f; }
+.text-link { font-weight: 700; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+@keyframes arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 480px) { .home-actions { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }

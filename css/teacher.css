@@ -1,0 +1,6 @@
+/* Small placeholder for the future teacher-facing experience. */
+.teacher-shell { width: min(100%, 680px); padding: 36px 24px; border-top: 8px solid var(--teal); background: var(--paper); text-align: center; animation: arrive 300ms ease-out both; }
+.teacher-shell h1 { margin: 0; font-size: clamp(2.5rem, 7vw, 4rem); }
+.teacher-note { margin: 18px 0 28px; color: var(--muted); font-size: 1.25rem; }
+.teacher-actions { display: grid; justify-items: center; gap: 22px; }
+.teacher-actions .button { width: min(100%, 390px); }
